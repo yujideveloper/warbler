@@ -126,6 +126,13 @@ describe Warbler::Jar, "with Bundler" do
       ENV['BUNDLE_GEMFILE'] = "Special-Gemfile"
       config.traits.should include(Warbler::Traits::Bundler)
     end
+
+    it "does not bundle duplicate jruby-jars" do
+      File.open("Gemfile", "w") {|f| f << "gem 'jruby-jars', '1.7.8'"}
+      jar.apply(config)
+      file_list(%r{WEB-INF/gems/gems/jruby-jars[^/]*/}).should be_empty 
+      file_list(%r{WEB-INF/lib/jruby-core-complete-1.7.8}).should_not be_empty
+    end
   end
 
   context "in a jar project" do

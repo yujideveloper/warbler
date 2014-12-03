@@ -204,6 +204,17 @@ describe Warbler::Jar do
         end
       end
 
+      it "excludes gem_excludes for compiled gems" do
+        config.compile_gems = true
+        config.gem_excludes = [/_test\.rb/]
+        config.compiled_ruby_files = %w(lib/sample_jar.rb)
+        jar.compile(config)
+        jar.apply(config)
+        file_list(%r{sample_jar.*\.rb$}).size.should == 2
+        file_list(%r{gems.*_test\.class$}).size.should == 0
+        file_list(%r{gems.*\.class$}).size.should == 43
+      end
+
     end
 
     context "with a gemspec without a default executable" do
